@@ -62,10 +62,6 @@ const axios = require('axios');
         }
       }
 
-      // // Save image URLs in a text file
-      // const urlsTxtPath = path.join(propertyFolderPath, 'image_urls.txt');
-      // fs.writeFileSync(urlsTxtPath, imageUrls.join('\n'), 'utf8');
-
       const detailinfo = await detailPage.evaluate(() => {
         const info = [];
         let element = '';
