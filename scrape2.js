@@ -4,10 +4,12 @@ const path = require('path');
 const ExcelJS = require('exceljs');
 const axios = require('axios');
 
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 (async () => {
   // Create a timestamped parent folder
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const parentDir = path.join(__dirname, timestamp);
+  const parentDir = path.join(__dirname, "homes"+timestamp);
   if (!fs.existsSync(parentDir)) {
     fs.mkdirSync(parentDir);
   }
@@ -18,20 +20,31 @@ const axios = require('axios');
   const allRecords = []; // To store all property data
 
   for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-    const pageUrl = `https://suumo.jp/jj/bukken/ichiran/JJ012FC001/?ar=030&bs=011&cn=9999999&cnb=0&et=9999999&initFlg=1&kb=1&kki=101&kt=9999999&mb=0&mt=9999999&ta=12&tj=0&pc=30&po=1&pj=2&page=${pageNum}`;
+    const pageUrl = `https://www.homes.co.jp/mansion/chuko/chiba/list/?page=${pageNum}`;
     const page = await browser.newPage();
     await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
     console.log(`Scraping page ${pageNum}: ${pageUrl}`);
 
+    await page.select('#cond_sortby', 'newdate'); // Sort by "新着順"
+    await page.select('#cond_newdate', '1'); // select "本日"
+
+    await delay(5000);
+
     // Get property links
     const propertyLinks = await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('h2.property_unit-title a'));
+      const links = Array.from(document.querySelectorAll('.mod-bukkenList .prg-bundle .mod-mergeBuilding--sale .moduleInner .moduleHead h3 a'));
       return links.map(link => link.href);
     });
 
+    // for (let i = 0; i < propertyLinks.length; i++) {
+    //   console.log(`Property ${i + 1} URL: ${propertyLinks[i]}`);
+    // }
+    
     console.log(`Found ${propertyLinks.length} properties on page ${pageNum}.`);
 
     for (let i = 0; i < Math.min(3, propertyLinks.length); i++) {
+      await delay(2000); // Wait for 2 seconds to ensure the page is fully loaded
+      
       const url = propertyLinks[i];
       const detailPage = await browser.newPage();
       await detailPage.goto(url, { waitUntil: 'domcontentloaded' });
@@ -45,14 +58,16 @@ const axios = require('axios');
 
       // Extract image URLs
       const imageUrls = await detailPage.evaluate(() => {
-        const imgs = Array.from(document.querySelectorAll('.js-slideLazy-image.js-noContextMenu'));
+        const imgs = Array.from(document.querySelectorAll('.max-w-screen.object-contain'));
         const srcs = imgs.map(img => img.src || img.getAttribute('rel'));
         return srcs.slice(0, 5);
       });
 
       // Download images into folder
+      console.log('count: %d', imageUrls.length);
       for (let j = 0; j < imageUrls.length; j++) {
         const imageUrl = imageUrls[j];
+        console.log("sdf");
         const imagePath = path.join(propertyFolderPath, `image_${j + 1}.jpg`);
         try {
           const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
