@@ -5,7 +5,7 @@ const ExcelJS = require('exceljs');
 const axios = require('axios');
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-const randomtime = (min = 1000, max = 2000) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomtime = (min = 0, max = 10) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 (async () => {
   // Create a timestamped parent folder
@@ -24,7 +24,6 @@ const randomtime = (min = 1000, max = 2000) => Math.floor(Math.random() * (max -
       '--disable-dev-shm-usage',
       '--disable-extensions',
       '--disable-infobars',
-      '--window-size=1920,1080',
       '--disable-gpu',
       '--disable-web-security',
       '--allow-running-insecure-content',
@@ -39,6 +38,7 @@ const randomtime = (min = 1000, max = 2000) => Math.floor(Math.random() * (max -
       '--disable-client-side-phishing-detection',
       '--disable-component-update',
       '--window-size=1280,800'
+
     ]
   });
   const totalPages = 2; // Set the number of pages to scrape
@@ -51,9 +51,9 @@ const randomtime = (min = 1000, max = 2000) => Math.floor(Math.random() * (max -
   await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
   await page.setViewport({ width: 1280, height: 800 });
 
-  await delay(randomtime());
+  // await delay(randomtime());
   await page.select('#cond_sortby', 'newdate'); // Sort by "新着順"
-  await delay(randomtime());
+  // await delay(randomtime());
   await page.select('#cond_newdate', '1'); // select "本日"
 
   for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
@@ -72,7 +72,7 @@ const randomtime = (min = 1000, max = 2000) => Math.floor(Math.random() * (max -
     console.log(`Found ${propertyLinks.length} properties on page ${pageNum}.`);
 
     for (let i = 0; i < propertyLinks.length; i++) {
-      await delay(randomtime()); // Wait for random seconds to ensure the page is fully loaded
+      // await delay(randomtime()); // Wait for random seconds to ensure the page is fully loaded
 
       const url = propertyLinks[i];
       const detailPage = await browser.newPage();
@@ -95,7 +95,7 @@ const randomtime = (min = 1000, max = 2000) => Math.floor(Math.random() * (max -
       console.log('count: %d', imageUrls.length);
 
       // Download images into folder
-      await delay(randomtime); // Wait for 2 seconds before downloading images
+      // await delay(randomtime); // Wait for 2 seconds before downloading images
 
       for (let j = 0; j < imageUrls.length; j++) {
         const imageUrl = imageUrls[j];
