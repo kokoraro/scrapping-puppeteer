@@ -15,6 +15,11 @@ const randomtime = (min = 0, max = 10) => Math.floor(Math.random() * (max - min 
     fs.mkdirSync(parentDir);
   }
 
+  const imageDir = path.join(parentDir, "Images");
+  if (!fs.existsSync(imageDir)) {
+    fs.mkdirSync(imageDir);
+  }
+
   const browser = await puppeteer.launch({
     executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Use real Chrome
     headless: false, // Open a visible browser window
@@ -80,7 +85,7 @@ const randomtime = (min = 0, max = 10) => Math.floor(Math.random() * (max - min 
 
       // Create folder for images
       const propertyFolderName = `property_${i + 1 + (pageNum - 1) * propertyLinks.length}`;
-      const propertyFolderPath = path.join(parentDir, propertyFolderName);
+      const propertyFolderPath = path.join(imageDir, propertyFolderName);
       if (!fs.existsSync(propertyFolderPath)) {
         fs.mkdirSync(propertyFolderPath);
       }
@@ -228,7 +233,7 @@ const randomtime = (min = 0, max = 10) => Math.floor(Math.random() * (max - min 
     // Click the "nextPage" button to navigate to the next page
     const nextPageButtonSelector = '.nextPage';
     const nextPageExists = await page.$(nextPageButtonSelector);
-  
+
     if (nextPageExists) {
       console.log('Navigating to the next page...');
       await page.click(nextPageButtonSelector);
@@ -243,7 +248,7 @@ const randomtime = (min = 0, max = 10) => Math.floor(Math.random() * (max - min 
 
   // Define columns with desired widths
   worksheet.columns = [
-    { header: 'URL', key: 'url', width: '20' },
+    { header: '不動産のURL', key: 'url', width: '20' },
     { header: '画像1', key: 'ImageURLs1', width: '20' },
     { header: '画像2', key: 'ImageURLs2', width: '20' },
     { header: '画像3', key: 'ImageURLs3', width: '20' },

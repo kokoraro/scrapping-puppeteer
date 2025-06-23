@@ -12,6 +12,11 @@ const axios = require('axios');
     fs.mkdirSync(parentDir);
   }
 
+  const imageDir = path.join(parentDir, "Images");
+  if (!fs.existsSync(imageDir)) {
+    fs.mkdirSync(imageDir);
+  }
+
   const browser = await puppeteer.launch({ headless: false });
   const totalPages = 2; // Set the number of pages to scrape
 
@@ -38,7 +43,7 @@ const axios = require('axios');
 
       // Create folder for images
       const propertyFolderName = `property_${i + 1 + (pageNum - 1) * propertyLinks.length}`;
-      const propertyFolderPath = path.join(parentDir, propertyFolderName);
+      const propertyFolderPath = path.join(imageDir, propertyFolderName);
       if (!fs.existsSync(propertyFolderPath)) {
         fs.mkdirSync(propertyFolderPath);
       }
@@ -53,6 +58,7 @@ const axios = require('axios');
       // Download images into folder
       for (let j = 0; j < imageUrls.length; j++) {
         const imageUrl = imageUrls[j];
+        console.log(`Downloading image ${j + 1} from ${imageUrl}`);
         const imagePath = path.join(propertyFolderPath, `image_${j + 1}.jpg`);
         try {
           const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
@@ -192,12 +198,12 @@ const axios = require('axios');
 
   // Define columns with desired widths
   worksheet.columns = [
-    { header: 'Property URL', key: 'url', width: '20' },
-    { header: 'image1', key: 'ImageURLs1', width: '20' },
-    { header: 'image2', key: 'ImageURLs2', width: '20' },
-    { header: 'image3', key: 'ImageURLs3', width: '20' },
-    { header: 'image4', key: 'ImageURLs4', width: '20' },
-    { header: 'image5', key: 'ImageURLs5', width: '20' },
+    { header: '不動産のURL', key: 'url', width: '20' },
+    { header: '画像1', key: 'ImageURLs1', width: '20' },
+    { header: '画像2', key: 'ImageURLs2', width: '20' },
+    { header: '画像3', key: 'ImageURLs3', width: '20' },
+    { header: '画像4', key: 'ImageURLs4', width: '20' },
+    { header: '画像5', key: 'ImageURLs5', width: '20' },
     { header: '株式会社', key: 'info31', width: '30' },
     { header: 'Tel', key: 'info32', width: '30' },
     { header: '販売スケジュール', key: 'info1', width: '30' },
