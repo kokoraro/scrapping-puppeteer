@@ -6,6 +6,7 @@ const axios = require('axios');
 
 (async () => {
   // Create a timestamped parent folder
+  //
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const parentDir = path.join(__dirname, "suumo" + timestamp);
   if (!fs.existsSync(parentDir)) {
